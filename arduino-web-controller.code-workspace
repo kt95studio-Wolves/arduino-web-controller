@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"name": "root",
+			"path": "."
+		}
+		{
+			"name": "arduino-code",
+			"path": "arduino-code"
+		},
+		{
+			"name": "arduino-gui",
+			"path": "arduino-gui"
+		},
+		{
+			"name": "arduino-serial-server",
+			"path": "arduino-serial-server"
+		},
+	],
+	"settings": {}
+}
