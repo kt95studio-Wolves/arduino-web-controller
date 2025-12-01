@@ -1,9 +1,9 @@
 #include <Arduino.h>
 
 // Define the digital pins for the three LEDs
-const int redLedPin = 10;
-const int yellowLedPin = 9;
-const int greenLedPin = 8;
+const int redLedPin = 7; // Digital pin 7 for red LED
+const int yellowLedPin = 4; // Digital pin 4 for yellow LED
+const int greenLedPin = 2; // Digital pin 2 for green LED
 
 // Define the character commands that will be sent via serial monitor
 const char redCommand = 'r';
