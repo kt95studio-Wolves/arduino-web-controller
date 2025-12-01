@@ -1,84 +1,97 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './App.css'; // Assuming you have some basic CSS
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import './App.css'; 
 
-// **CHANGE THIS** if your server is on a different IP/Port
 const WS_SERVER_URL = 'ws://localhost:3001'; 
 
 function App() {
   const wsRef = useRef(null);
+  const scrollRef = useRef(null); // Ref to auto-scroll the terminal
   const [statusMessages, setStatusMessages] = useState([]);
   const [connectionStatus, setConnectionStatus] = useState('Connecting...');
 
-  // Effect to manage WebSocket connection
   useEffect(() => {
-    // We use a constant to avoid issues with cleanup
     const socket = new WebSocket(WS_SERVER_URL);
     wsRef.current = socket;
 
-    socket.onopen = () => {
-      setConnectionStatus('Connected');
-    };
+    socket.onopen = () => setConnectionStatus('Connected');
 
     socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        // Display both status messages from Arduino and server errors
-        const messageToDisplay = data.type === 'error' ? `ERROR: ${data.message}` : data.message;
-        
+        const messageToDisplay = data.type === 'error' ? `[ERR] ${data.message}` : `> ${data.message}`;
         setStatusMessages(prev => [...prev, messageToDisplay]);
       } catch (e) {
-        // Fallback for non-JSON messages (though Arduino output should be clean text)
-        setStatusMessages(prev => [...prev, event.data]);
+        setStatusMessages(prev => [...prev, `> ${event.data}`]);
       }
     };
 
-    socket.onclose = () => {
-      setConnectionStatus('Disconnected');
-    };
-
-    socket.onerror = (error) => {
-      setConnectionStatus('Connection Error');
-    };
+    socket.onclose = () => setConnectionStatus('Disconnected');
+    socket.onerror = () => setConnectionStatus('Connection Error');
     
-    // Cleanup function to close the connection when the component unmounts
-    return () => {
-      socket.close();
-    };
+    return () => socket.close();
   }, []);
 
-  // Function to send the command ('r', 'y', or 'g') to the server
+  // Auto-scroll to bottom of terminal
+  useLayoutEffect(() => {
+    if(scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [statusMessages]);
+
   const sendCommand = (command) => {
     const ws = wsRef.current;
     if (ws && ws.readyState === WebSocket.OPEN) {
-      // The server expects a raw command character
       ws.send(command);
     } else {
-      alert(`Cannot send command. Status: ${connectionStatus}`);
+      alert(`SYSTEM OFFLINE: ${connectionStatus}`);
     }
   };
 
   return (
-    <div className="App-container">
-      <h1>🚦 Arduino LED Web Controller</h1>
-      <p>Server Status: <strong className={`status-${connectionStatus.toLowerCase().replace(' ', '-')}`}>{connectionStatus}</strong></p>
-      
-      <div className="button-group">
-        <button className="red-btn" onClick={() => sendCommand('r')}>
-          Toggle Red (R)
-        </button>
-        <button className="yellow-btn" onClick={() => sendCommand('y')}>
-          Toggle Yellow (Y)
-        </button>
-        <button className="green-btn" onClick={() => sendCommand('g')}>
-          Toggle Green (G)
-        </button>
-      </div>
+    <div className="cyber-wrapper">
+      <div className="scanlines"></div>
+      <div className="App-container">
+        
+        {/* Header Section */}
+        <header className="cyber-header">
+          <h1 className="glitch-text" data-text="ARDUINO_NET_LINK">ARDUINO_NET_LINK</h1>
+          <div className="status-panel">
+            <span className="status-label">SYS.STATUS:</span>
+            <strong className={`status-indicator status-${connectionStatus.toLowerCase().replace(' ', '-')}`}>
+              {connectionStatus.toUpperCase()}
+            </strong>
+          </div>
+        </header>
 
-      <h2>Serial Output</h2>
-      <div className="serial-monitor">
-        {statusMessages.map((msg, index) => (
-          <p key={index}>{msg}</p>
-        ))}
+        {/* Control Deck */}
+        <div className="control-deck">
+            <div className="cyber-frame">
+                <h3>// MANUAL_OVERRIDE</h3>
+                <div className="button-group">
+                    <button className="cyber-btn red-btn" onClick={() => sendCommand('r')}>
+                    <span className="btn-content">RELAY_RED</span>
+                    </button>
+                    <button className="cyber-btn yellow-btn" onClick={() => sendCommand('y')}>
+                    <span className="btn-content">RELAY_YEL</span>
+                    </button>
+                    <button className="cyber-btn green-btn" onClick={() => sendCommand('g')}>
+                    <span className="btn-content">RELAY_GRN</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {/* Terminal Output */}
+        <div className="terminal-section">
+            <h3>// SERIAL_DATA_STREAM</h3>
+            <div className="serial-monitor" ref={scrollRef}>
+                {statusMessages.length === 0 && <p className="placeholder-text">Waiting for data stream...</p>}
+                {statusMessages.map((msg, index) => (
+                    <p key={index} className="terminal-line">{msg}</p>
+                ))}
+            </div>
+        </div>
+
       </div>
     </div>
   );
