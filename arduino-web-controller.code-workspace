@@ -1,21 +1,83 @@
 {
-	"folders": [
-		{
-			"name": "root",
-			"path": "."
-		}
-		{
-			"name": "arduino-code",
-			"path": "arduino-code"
-		},
-		{
-			"name": "arduino-gui",
-			"path": "arduino-gui"
-		},
-		{
-			"name": "arduino-serial-server",
-			"path": "arduino-serial-server"
-		},
-	],
-	"settings": {}
+  "folders": [
+    {
+      "name": "root",
+      "path": "."
+    },
+    {
+      "name": "arduino-code",
+      "path": "arduino-code"
+    },
+    {
+      "name": "arduino-gui",
+      "path": "arduino-gui"
+    },
+    {
+      "name": "arduino-serial-server",
+      "path": "arduino-serial-server"
+    }
+  ],
+  "settings": {
+    /* -----------------------------
+       Global Editor Settings
+       ----------------------------- */
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.rulers": [80, 120],
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+
+    /* -----------------------------
+       Prettier Configuration (Web)
+       ----------------------------- */
+    // specific settings for JS/React/Node
+    "prettier.semi": true,
+    "prettier.singleQuote": true,
+    "prettier.tabWidth": 2,
+    "prettier.trailingComma": "es5",
+    "prettier.printWidth": 80,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+    /* -----------------------------
+       Arduino & C++ Overrides
+       ----------------------------- */
+    // Ensure Prettier doesn't mess up Arduino/C++ code.
+    // Uses the Microsoft C/C++ extension for formatting instead.
+    "[cpp]": {
+      "editor.defaultFormatter": "ms-vscode.cpptools",
+      "editor.tabSize": 4
+    },
+    "[c]": {
+      "editor.defaultFormatter": "ms-vscode.cpptools",
+      "editor.tabSize": 4
+    },
+    "[arduino]": {
+      "editor.defaultFormatter": "vsciot-vscode.vscode-arduino",
+      "editor.tabSize": 2
+    },
+
+    /* -----------------------------
+       File Association & Search
+       ----------------------------- */
+    "files.associations": {
+      "*.ino": "cpp"
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/build": true,
+      "**/dist": true,
+      "**/.git": true
+    },
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/node_modules": true
+    },
+
+    /* -----------------------------
+       Terminal & Integrated Shell
+       ----------------------------- */
+    // Useful if you need to jump between node and arduino CLI tools
+    "terminal.integrated.cwd": "${workspaceFolder}"
+  }
 }
